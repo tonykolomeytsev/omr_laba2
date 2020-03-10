@@ -157,16 +157,6 @@ int main()
 	YouBotManipulator *ybArm = nullptr;
 	initYoubotConfiguration(ybBase, ybArm);
 
-	/* Variable for the arm. */
-	JointAngleSetpoint desiredJointAngle1;
-	JointAngleSetpoint desiredJointAngle2;
-	JointAngleSetpoint desiredJointAngle3;
-	JointAngleSetpoint desiredJointAngle4;
-	JointSensedAngle   phi1a;
-	JointSensedAngle   phi2a;
-	JointSensedAngle   phi3a;
-	JointSensedAngle   phi4a;
-
 	try {
 		// if ybBase != null
 		if (ybBase) {
