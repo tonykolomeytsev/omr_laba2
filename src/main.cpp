@@ -3,31 +3,27 @@
 
 using namespace youbot;
 
-void initYoubotConfiguration(bool &youBotHasBase, bool &youBotHasArm) 
+void initYoubotConfiguration(YouBotBase *ybBase, YouBotManipulator *ybArm) 
 {
 	try {
 		ybBase = new YouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);
 		ybBase->doJointCommutation();
-
-		youBotHasBase = true;
 	} catch (std::exception& e) {
+		LOG(warning) << "Unable to define robot base: ";
 		LOG(warning) << e.what();
-		youBotHasBase = false;
 	}
 
 	try {
 		ybArm = new YouBotManipulator("youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
 		ybArm->doJointCommutation();
 		ybArm->calibrateManipulator();
-
-		youBotHasArm = true;
 	} catch (std::exception& e) {
+		LOG(warning) << "Unable to define robot arm: ";
 		LOG(warning) << e.what();
-		youBotHasArm = false;
 	}
 }
 
-int main2() 
+int main() 
 {
 	/* create handles for youBot base and manipulator (if available) */
 	YouBotBase *ybBase = nullptr;
@@ -89,18 +85,15 @@ int main2()
 		std::cout << e.what() << std::endl;
 	}
 
-	/* clean up */
+	/* clean up memory */
 	if (ybBase) {
 		delete ybBase;
-		ybBase = 0;
+		ybBase = nullptr;
 	}
 	if (ybArm) {
 		delete ybArm;
-		ybArm = 0;
+		ybArm = nullptr;
 	}
-
-	LOG(info) << "Done.";
-
 	return 0;
 }
 
