@@ -24,6 +24,10 @@
 
 using namespace youbot;
 
+/**
+ * КЛАСС_ОБЕРТКА 
+ * для сокращения количества кода) 💩💩💩
+ * */
 class Angles
 {
 private:
@@ -88,14 +92,11 @@ void logAngles(double time, double phi2, double phi3, double phi4)
     fclose(l); 
 }
 
-void toTechAngles(
-	const double phi2, 
-	const double phi3, 
-	const double phi4, 
-	double &A2, 
-	double &A3, 
-	double &A4
-) {
+/**
+ * Переход от кинематических углов к "техническим"
+ * */
+void toTechAngles(double phi2, double phi3, double phi4, double &A2, double &A3, double &A4) 
+{
 	A2 = phi2 + 1.1345;
 	A3 = phi3 - 2.5654;
 	A4 = phi4 + 1.829;
@@ -138,7 +139,7 @@ void task1(YouBotBase *&ybBase, YouBotManipulator *&ybArm)
 
 
 /**
- * РЕШЕНИЕ 2: ЧИСЛЕННЫЙ МЕТОД, КООРДИНАТЫ
+ * РЕШЕНИЕ 2: ЧИСЛЕННЫЙ МЕТОД, КООРДИНАТЫ 🔥🔥🔥
  * */
 void task2(YouBotBase *&ybBase, YouBotManipulator *&ybArm) 
 {
@@ -215,7 +216,7 @@ void task2(YouBotBase *&ybBase, YouBotManipulator *&ybArm)
 
 
 /**
- * РЕШЕНИЕ 3: ЧИСЛЕННЫЙ МЕТОД, СКОРОСТИ
+ * РЕШЕНИЕ 3: ЧИСЛЕННЫЙ МЕТОД, СКОРОСТИ 🙊
  * */
 void task3(YouBotBase *&ybBase, YouBotManipulator *&ybArm) {
 
