@@ -71,7 +71,7 @@ namespace youbot {
         void calibrateManipulator() { /* mock */ }
         ArmJoint getArmJoint(const int jointNumber) {
             if (jointNumber >= 1 && jointNumber <= 5)
-                return joints->at(jointNumber);
+                return joints->at(jointNumber - 1);
         }
     };
 }
