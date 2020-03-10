@@ -1,9 +1,10 @@
 #include "youbot/YouBotBase.hpp"
 #include "youbot/YouBotManipulator.hpp"
+#include <iostream>
 
 using namespace youbot;
 
-void initYoubotConfiguration(YouBotBase *ybBase, YouBotManipulator *ybArm) 
+void initYoubotConfiguration(YouBotBase *&ybBase, YouBotManipulator *&ybArm) 
 {
 	try {
 		ybBase = new YouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);

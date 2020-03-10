@@ -2,6 +2,7 @@
  * THIS IS THE MOCK FILE
  **/
 #include <vector>
+#include <iostream>
 #include "Constants.hpp"
 #define ARM_DOF 5
 
@@ -33,12 +34,16 @@ namespace youbot {
     class ArmJoint
     {
     private:
+        int number;
         double angle;
     public:
-        ArmJoint(/* args */) { /* mock */ }
+        ArmJoint(const int number) {
+            this->number = number;
+        }
         ~ArmJoint() { /* mock */ }
         void setData(const JointAngleSetpoint setpoint) {
             this->angle = setpoint.angle;
+            LOG(info) << "JOINT #" << this->number << " SET ANGLE " << this->angle << std::endl;
         }
         void getData(JointSensedAngle sensed) {
             sensed.angle = this->angle;
@@ -54,7 +59,7 @@ namespace youbot {
         YouBotManipulator(const char* mockName, const char* mockFileName) { 
             joints = new std::vector<ArmJoint>();
             for (int i = 0; i< ARM_DOF; i++)
-                joints->push_back(ArmJoint());
+                joints->push_back(ArmJoint(i));
         }
         ~YouBotManipulator() { 
             if (joints) {

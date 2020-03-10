@@ -11,5 +11,5 @@
 #define info "INFO"
 #define warning "WARNING"
 
-#define SLEEP_MILLISEC(x) std::cout << "SLEEP FOR " << x << " MILLISECONDS"
+#define SLEEP_MILLISEC(x) std::cout << "SLEEP FOR " << x << " MILLISECONDS" << std::endl
 
