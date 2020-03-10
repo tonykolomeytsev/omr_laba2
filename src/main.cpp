@@ -3,8 +3,9 @@
 #include <iostream>
 #include <math.h>
 
-#define TASK_NUMBER 1
-#define LOG_FILE_NAME "./log.csv"
+#define TASK_NUMBER 	2
+#define LOG_FILE_NAME 	"./log.csv"
+#define EPSILON_2 		0.01
 
 #define TIME_START 	0.0
 #define TIME_END	10.0
@@ -103,7 +104,8 @@ void toTechAngles(
 /**
  * РЕШЕНИЕ 1: АНАЛИТИЧЕСКОЕ 😄
  * */
-void task1(YouBotBase *&ybBase, YouBotManipulator *&ybArm) {
+void task1(YouBotBase *&ybBase, YouBotManipulator *&ybArm) 
+{
 	createLog();
 	auto angles = new Angles(ybArm);
 	auto z = [=](double t) -> double { return 0.2 + 0.1 * cos((2 * PI * t) / 10); };
@@ -138,8 +140,77 @@ void task1(YouBotBase *&ybBase, YouBotManipulator *&ybArm) {
 /**
  * РЕШЕНИЕ 2: ЧИСЛЕННЫЙ МЕТОД, КООРДИНАТЫ
  * */
-void task2(YouBotBase *&ybBase, YouBotManipulator *&ybArm) {
+void task2(YouBotBase *&ybBase, YouBotManipulator *&ybArm) 
+{
+	createLog();
+	auto angles = new Angles(ybArm);
+	auto z = [=](double t) -> double { return 0.2 + 0.1 * cos((2 * PI * t) / 10); };
+	// рабочие величины
+	double J[2][2] = {{0, 0}, {0, 0}};
+	double invJ[2][2] = {{0, 0}, {0, 0}};
+	double X[2] = {0, 0};
+	double E[2] = {1, 1}; 
+	// вычисление Якобиана
+	auto calcJ = [&](double J[2][2], double phi2, double phi3) -> void { 
+		const double c2 = cos(phi2), c23 = cos(phi2 + phi3);
+		const double s2 = sin(phi2), s23 = sin(phi2 + phi3);
+		J[0][0] = c2*L2+c23*L3; J[0][1] = c23*L3;
+		J[1][0] =-s2*L2-s23*L3; J[1][1] =-s23*L3;
+	};
+	// решение прямой задачи
+	auto calcX = [&](double* X, double phi2, double phi3) -> void {
+		const double c2 = cos(phi2), c23 = cos(phi2 + phi3);
+		const double s2 = sin(phi2), s23 = sin(phi2 + phi3);
+		X[0] = D1 + L2*s2 + L3*s23;
+    	X[1] = L1 + L2*c2 + L3*c23;
+	};
+	// вычисление псевдообратной матрицы
+	auto calcInvJ = [&](double J[2][2], double invJ[2][2]) -> void { 
+		double 	a = J[0][0], b = J[0][1],
+				c = J[1][0], d = J[1][1];
+		invJ[0][0] = d / (a*d - b*c); invJ[0][1] = b / (b*c - a*d);
+		invJ[1][0] = c / (b*c - a*d); invJ[1][1] = a / (a*d - b*c);
+	};
+	// норма 2
+	auto norm2 = [](double* E) -> double { return sqrt(SQR(E[0]) + SQR(E[1])); };
+	
+	for (double t = TIME_START; t <= TIME_END; t += TIME_STEP) 
+	{
+		E[0] = 1; E[1] = 1; // сбрасываем ошибку
+		double phi2 = 1;
+		double phi3 = 1;
 
+		int i = 0; // на всякий случай ограничим кол-во итераций
+		while (norm2(E) > 0.01 && i++ < 10) {
+			// находим якобиан
+			calcJ(J, phi2, phi3);
+			// решаем прямую задачу для текущих углов
+			calcX(X, phi2, phi3); 
+			// сравниваем решение прямой задачи с требуемыми координатами схвата
+			E[0] = X[0] - X_A1; E[1] = X[1] - z(t);
+			// найдем псевдообратную матрицу якобиана
+			calcInvJ(J, invJ);
+			// находим компоненты векторы полного шага 
+			double pPhi2 = invJ[0][0] * E[0] + invJ[0][1] * E[1];
+			double pPhi3 = invJ[1][0] * E[0] + invJ[1][1] * E[1];
+
+			// делаем приращение к искомым значениям углов
+			phi2 -= pPhi2;
+			phi3 -= pPhi3;
+		}
+
+		double phi4 = (PI/2) - phi3 - phi2;
+		logAngles(t, phi2, phi3, phi4);
+
+		// переходим к техническим углам, они нужны для управления
+		double A2, A3, A4;
+		toTechAngles(phi2, phi3, phi4, A2, A3, A4);
+		angles->setAngles(A2, A3, A4);
+	}
+
+
+	delete angles;
+	angles = nullptr;
 }
 
 
