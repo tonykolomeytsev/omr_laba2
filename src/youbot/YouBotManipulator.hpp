@@ -45,8 +45,9 @@ namespace youbot {
             this->angle = setpoint.angle;
             LOG(info) << "JOINT #" << this->number << " SET ANGLE " << this->angle << std::endl;
         }
-        void getData(JointSensedAngle sensed) {
+        void getData(JointSensedAngle &sensed) {
             sensed.angle = this->angle;
+            LOG(info) << "JOINT #" << this->number << " GET ANGLE " << this->angle << std::endl;
         }
     };
     
