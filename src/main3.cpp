@@ -28,9 +28,9 @@
 #define D1      0.033 // m
 #define L1      0.075 // m
 #define L2      0.155 // m
-#define L3      0.135 // m
 #define L4      0.081 // m
 #define L5      0.137 // m
+#define L3      0.135+L4+L5 // m
 
 using namespace youbot;
 
@@ -62,13 +62,13 @@ public:
         ybArm->getArmJoint(4).setData(j4);
     }
     void getAngles(double &A2, double &A3, double &A4) {
-        ybArm->getArmJoint(2).getData(jsa2);
-        ybArm->getArmJoint(3).getData(jsa3);
-        ybArm->getArmJoint(4).getData(jsa4);
+        // ybArm->getArmJoint(2).getData(jsa2);
+        // ybArm->getArmJoint(3).getData(jsa3);
+        // ybArm->getArmJoint(4).getData(jsa4);
         
-        A2 = jsa2.angle / radian;
-        A3 = jsa3.angle / radian;
-        A4 = jsa4.angle / radian;
+        // A2 = jsa2.angle / radian;
+        // A3 = jsa3.angle / radian;
+        // A4 = jsa4.angle / radian;
     }
 };
 
@@ -107,10 +107,10 @@ void createLog()
 /**
  * Логирование углов
  * */
-void logAngles(double time, double phi2, double phi3, double phi4) 
+void logAll(double time, double phi2, double phi3, double phi4, double X, double Z) 
 {
     FILE *l = fopen(LOG_FILE_NAME, "a");    
-    fprintf(l, "%3.2f, %8.6f, %8.6f, %8.6f \n", time, phi2, phi3, phi4);
+    fprintf(l, "%3.2f, %8.6f, %8.6f, %8.6f, %8.6f, %8.6f \n", time, phi2, phi3, phi4, X, Z);
     fclose(l); 
 }
 
@@ -173,7 +173,7 @@ int main()
             // движение вперед
             for (double t = TIME_START; t <= TIME_END; t += TIME_STEP) 
             {
-                double X_ = X_A1 - D1;
+                double X_ = x(t) - D1;
                 double Z_ = z(t) - L1;
                 double D_ = (SQR(X_) + SQR(Z_) - (SQR(L3) + SQR(L2))) / (2 * L2 * L3);
                 double phi3 = acos(D_);
@@ -190,15 +190,15 @@ int main()
                 angles.setAngles(A2, A3, A4); // поворачиваем приводы на нужные углы
                 SLEEP_MILLISEC(TIME_STEP); // ждем
 
-                angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
-                fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
-                logAngles(t, A2, A3, A4); // выводим в лог время и измеренные углы
+                //angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
+                //fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
+                logAll(t, phi2, phi3, phi4, X_, Z_); // выводим в лог время и измеренные углы
             }
             
             // движение назад
             for (double t = TIME_END; t >= TIME_START; t -= TIME_STEP) 
             {
-                double X_ = X_A1 - D1;
+                double X_ = x(t) - D1;
                 double Z_ = z(t) - L1;
                 double D_ = (SQR(X_) + SQR(Z_) - (SQR(L3) + SQR(L2))) / (2 * L2 * L3);
                 double phi3 = acos(D_);
@@ -215,9 +215,9 @@ int main()
                 angles.setAngles(A2, A3, A4); // поворачиваем приводы на нужные углы
                 SLEEP_MILLISEC(TIME_STEP); // ждем
 
-                angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
-                fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
-                logAngles(t, A2, A3, A4); // выводим в лог время и измеренные углы
+                //angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
+                //fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
+                logAll(t, phi2, phi3, phi4, X_, Z_); // выводим в лог время и измеренные углы
             }
         }
 
