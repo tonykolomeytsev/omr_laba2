@@ -229,9 +229,47 @@ int main()
                 angles.setAngles(A2, A3, A4); // поворачиваем приводы на нужные углы
                 SLEEP_MILLISEC(TIME_STEP); // ждем
 
-                angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
-                fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
+                // angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
+                // fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
                 logAll(t, phi2, phi3, phi4, X[0], X[1]); // выводим в лог время и измеренные углы
+            }
+
+            // движение назад
+            for (double t = TIME_END; t >= TIME_START; t -= TIME_STEP) 
+            {
+                E[0] = 1; E[1] = 1; // сбрасываем ошибку
+                double phi2 = PI/6;
+                double phi3 = PI/6;
+
+                int i = 0; // на всякий случай ограничим кол-во итераций
+                while (norm2(E) > 0.001 && i++ < 10) {
+                    // находим якобиан
+                    calcJ(J, phi2, phi3);
+                    // решаем прямую задачу для текущих углов
+                    calcX(X, phi2, phi3); 
+                    // сравниваем решение прямой задачи с требуемыми координатами схвата
+                    E[0] = X[0] - x(t); E[1] = X[1] - z(t);
+                    // найдем псевдообратную матрицу якобиана
+                    calcInvJ(J, invJ);
+                    // находим компоненты векторы полного шага 
+                    double pPhi2 = invJ[0][0] * E[0] + invJ[0][1] * E[1];
+                    double pPhi3 = invJ[1][0] * E[0] + invJ[1][1] * E[1];
+
+                    // делаем приращение к искомым значениям углов
+                    phi2 -= pPhi2;
+                    phi3 -= pPhi3;
+                }
+
+                double phi4 = PHI_4;
+
+                double A2, A3, A4;
+                toTechAngles(phi2, phi3, phi4, A2, A3, A4); // переходим к техническим углам
+                angles.setAngles(A2, A3, A4); // поворачиваем приводы на нужные углы
+                SLEEP_MILLISEC(TIME_STEP); // ждем
+
+                // angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
+                // fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
+                logAll(2*TIME_END-t, phi2, phi3, phi4, X[0], X[1]); // выводим в лог время и измеренные углы
             }
         }
 
