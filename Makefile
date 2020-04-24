@@ -5,6 +5,7 @@ build:
 	/usr/bin/g++ -g "./src/main1.cpp" -o "./src/main1"
 	/usr/bin/g++ -g "./src/main2.cpp" -o "./src/main2"
 	/usr/bin/g++ -g "./src/main3.cpp" -o "./src/main3"
+	/usr/bin/g++ -g "./src/main4.cpp" -o "./src/main4"
 	
 run1:
 	# чистим кэш
@@ -23,4 +24,10 @@ run3:
 	rm -f log.csv
 	# запускаем что получилось
 	./src/main3
+
+run4:
+	# чистим кэш
+	rm -f log.csv
+	# запускаем что получилось
+	./src/main4
 

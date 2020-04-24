@@ -53,13 +53,13 @@ public:
         ybArm->getArmJoint(4).setData(j4);
     }
     void getAngles(double &A2, double &A3, double &A4) {
-        // ybArm->getArmJoint(2).getData(jsa2);
-        // ybArm->getArmJoint(3).getData(jsa3);
-        // ybArm->getArmJoint(4).getData(jsa4);
+        ybArm->getArmJoint(2).getData(jsa2);
+        ybArm->getArmJoint(3).getData(jsa3);
+        ybArm->getArmJoint(4).getData(jsa4);
         
-        // A2 = jsa2.angle / radian;
-        // A3 = jsa3.angle / radian;
-        // A4 = jsa4.angle / radian;
+        A2 = jsa2.angle / radian;
+        A3 = jsa3.angle / radian;
+        A4 = jsa4.angle / radian;
     }
 };
 
@@ -146,17 +146,17 @@ double x(const double t)
 // вычисление Якобиана
 void calcJ(double J[2][2], double phi2, double phi3) 
 { 
-    const double c2 = cos(phi2), c23 = cos(phi2 + phi3), c234 = cos(phi2 + phi3 + PHI_4);
-    const double s2 = sin(phi2), s23 = sin(phi2 + phi3), s234 = cos(phi2 + phi3 + PHI_4);
-    J[0][0] = c2*L2+c23*L3/*+(L4+L5)*c234*/; J[0][1] = c23*L3/*+(L4+L5)*c234*/;
-    J[1][0] =-s2*L2-s23*L3/*-(L4+L5)*s234*/; J[1][1] =-s23*L3/*+(L4+L5)*s234*/;
+    const double c2 = cos(phi2), c23 = cos(phi2 + phi3);
+    const double s2 = sin(phi2), s23 = sin(phi2 + phi3);
+    J[0][0] = c2*L2+c23*L3; J[0][1] = c23*L3;
+    J[1][0] =-s2*L2-s23*L3; J[1][1] =-s23*L3;
 }
 
 // решение прямой задачи
 void calcX(double* X, double phi2, double phi3) 
 {
-    const double c2 = cos(phi2), c23 = cos(phi2 + phi3), c234 = cos(phi2 + phi3 + PHI_4);
-    const double s2 = sin(phi2), s23 = sin(phi2 + phi3), s234 = cos(phi2 + phi3 + PHI_4);
+    const double c2 = cos(phi2), c23 = cos(phi2 + phi3);
+    const double s2 = sin(phi2), s23 = sin(phi2 + phi3);
     X[0] = D1 + L2*s2 + L3*s23 + (L4+L5)*sin(PHI_4);
     X[1] = L1 + L2*c2 + L3*c23 + (L4+L5)*cos(PHI_4);
 }
@@ -200,17 +200,17 @@ int main()
             for (double t = TIME_START; t <= TIME_END; t += TIME_STEP) 
             {
                 E[0] = 1; E[1] = 1; // сбрасываем ошибку
-                double phi2 = PI/3;
-                double phi3 = PI/3;
+                double phi2 = PI/6;
+                double phi3 = PI/6;
 
                 int i = 0; // на всякий случай ограничим кол-во итераций
-                while (norm2(E) > 0.01 && i++ < 10) {
+                while (norm2(E) > 0.001 && i++ < 10) {
                     // находим якобиан
                     calcJ(J, phi2, phi3);
                     // решаем прямую задачу для текущих углов
                     calcX(X, phi2, phi3); 
                     // сравниваем решение прямой задачи с требуемыми координатами схвата
-                    E[0] = X[0] - X_A1; E[1] = X[1] - z(t);
+                    E[0] = X[0] - x(t); E[1] = X[1] - z(t);
                     // найдем псевдообратную матрицу якобиана
                     calcInvJ(J, invJ);
                     // находим компоненты векторы полного шага 
@@ -229,8 +229,8 @@ int main()
                 angles.setAngles(A2, A3, A4); // поворачиваем приводы на нужные углы
                 SLEEP_MILLISEC(TIME_STEP); // ждем
 
-                //angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
-                //fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
+                angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
+                fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
                 logAll(t, phi2, phi3, phi4, X[0], X[1]); // выводим в лог время и измеренные углы
             }
         }
