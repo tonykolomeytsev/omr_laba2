@@ -183,7 +183,7 @@ int main()
                 double gamma_ = acos((SQR(L_) + SQR(L2) - SQR(L3)) / (2 * L_ * L2));
                 double phi2 = (PI/2) - gamma_ - beta_;
 
-                double phi4 = (PI/2) - phi3 - phi2;
+                double phi4 = phi3;//(PI/2) - phi3 - phi2;
 
                 double A2, A3, A4;
                 toTechAngles(phi2, phi3, phi4, A2, A3, A4); // переходим к техническим углам
@@ -192,7 +192,7 @@ int main()
 
                 //angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
                 //fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
-                logAll(t, phi2, phi3, phi4, X_, Z_); // выводим в лог время и измеренные углы
+                logAll(t, phi2, phi3, phi4, X_, Z_+L1); // выводим в лог время и измеренные углы
             }
             
             // движение назад
@@ -208,7 +208,7 @@ int main()
                 double gamma_ = acos((SQR(L_) + SQR(L2) - SQR(L3)) / (2 * L_ * L2));
                 double phi2 = (PI/2) - gamma_ - beta_;
 
-                double phi4 = (PI/2) - phi3 - phi2;
+                double phi4 = phi3;// (PI/2) - phi3 - phi2;
 
                 double A2, A3, A4;
                 toTechAngles(phi2, phi3, phi4, A2, A3, A4); // переходим к техническим углам
@@ -217,7 +217,7 @@ int main()
 
                 //angles.getAngles(A2, A3, A4); // измеряем реальные углы поворота приводов
                 //fromTechAngles(A2, A3, A4, phi2, phi3, phi4); // переходим к кинематическим углам
-                logAll(t, phi2, phi3, phi4, X_, Z_); // выводим в лог время и измеренные углы
+                logAll(2*TIME_END-t, phi2, phi3, phi4, X_, Z_+L1); // выводим в лог время и измеренные углы
             }
         }
 
